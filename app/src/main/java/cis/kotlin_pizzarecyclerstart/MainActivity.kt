@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -30,9 +31,13 @@ import androidx.compose.ui.Modifier         // <-- for Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType  // <-- for KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.lazy.items
+
 
 // If you're using Slider from Material3, add this:
 import androidx.compose.material3.Slider
+import cis.kotlin_pizzarecyclerstart.data.PizzaDatabase
+import cis.kotlin_pizzarecyclerstart.data.PizzaRepositoryImpl
 
 // Your project imports
 import cis.kotlin_pizzarecyclerstart.ui.theme.Kotlin_PizzaRecyclerStart_F25Theme
@@ -81,32 +86,13 @@ fun PizzaOrderScreen(vm: MainViewModel) {
         Text("Pizza Order", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(20.dp))
 
-        // SIZE
-        Column(Modifier.fillMaxWidth()) {
-            Text("Size: ${size.toPretty()}", style = MaterialTheme.typography.titleMedium)
-            Slider(
-                value = size.toIndex().toFloat(),
-                onValueChange = { idx -> vm.updateSize(indexToSize(idx.toInt())) },
-                valueRange = 0f..3f,
-                steps = 2
-            )
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Small"); Text("X-Large")
-            }
-        }
+        //SIZE
+        SizeDisplay(size)
 
         Spacer(Modifier.height(16.dp))
 
         // TOPPINGS
-        Column(Modifier.fillMaxWidth()) {
-            Text("Toppings", style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(8.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                FilterChip(selected = chicken, onClick = { vm.toggleChicken() }, label = { Text("Chicken") })
-                FilterChip(selected = pepperoni, onClick = { vm.togglePepperoni() }, label = { Text("Pepperoni") })
-                FilterChip(selected = greenPeppers, onClick = { vm.toggleGreenPeppers() }, label = { Text("Green Peppers") })
-            }
-        }
+        Toppings(chicken, pepperoni, greenPeppers, vm)
 
         Spacer(Modifier.height(16.dp))
 
@@ -125,22 +111,76 @@ fun PizzaOrderScreen(vm: MainViewModel) {
 
         Spacer(Modifier.height(16.dp))
 
-        // ORDER BOX (read-only)
-        OutlinedTextField(
-            value = orderText,
-            onValueChange = { /* read-only */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            label = { Text("Order") },
-            placeholder = { Text("Your order will appear here...") },
-            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                keyboardType = KeyboardType.Text
-            ),
-            readOnly = true,
-            minLines = 6,
-            maxLines = 20
+        // ✅ FIX: keep OrderBox *inside the Column scope*
+        OrderBox(orderText)
+    }
+}
+
+
+
+@Composable
+fun Toppings(chicken: Boolean, pepperoni: Boolean, greenPeppers: Boolean, vm: MainViewModel = viewModel()) {
+    Column(Modifier.fillMaxWidth()) {
+        Text("Toppings", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            FilterChip(selected = chicken, onClick = { vm.toggleChicken() }, label = { Text("Chicken") })
+            FilterChip(selected = pepperoni, onClick = { vm.togglePepperoni() }, label = { Text("Pepperoni") })
+            FilterChip(selected = greenPeppers, onClick = { vm.toggleGreenPeppers() }, label = { Text("Green Peppers") })
+        }
+    }
+}
+
+@Composable
+fun SizeDisplay(size: PizzaSize, vm: MainViewModel = viewModel()) {
+    // SIZE
+    Column(Modifier.fillMaxWidth()) {
+        Text("Size: ${size.toPretty()}", style = MaterialTheme.typography.titleMedium)
+        Slider(
+            value = size.toIndex().toFloat(),
+            onValueChange = { idx -> vm.updateSize(indexToSize(idx.toInt())) },
+            valueRange = 0f..3f,
+            steps = 2
         )
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Small"); Text("X-Large")
+        }
+    }
+}
+
+@Composable
+fun OrderBox(orderText: String) {
+    // ORDER BOX (read-only)
+    OutlinedTextField(
+        value = orderText,
+        onValueChange = { /* read-only */ },
+        //modifier = Modifier.fillMaxWidth().weight(1f),
+        label = { Text("Order") },
+        placeholder = { Text("Your order will appear here...") },
+        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+            keyboardType = KeyboardType.Text
+        ),
+        readOnly = true,
+        minLines = 6,
+        maxLines = 20
+    )
+}
+
+@Composable
+    fun PizzaItem(pizza: Pizza) {
+        Column(Modifier.padding(all=16.dp)) {
+            Text(pizza.size.toString(), style = MaterialTheme.typography.titleMedium)
+        }
+    }
+
+@Composable
+fun PizzaList(pizzas: List<Pizza>) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(pizzas) { pizza ->
+            PizzaItem(pizza = pizza)
+        }
     }
 }
 

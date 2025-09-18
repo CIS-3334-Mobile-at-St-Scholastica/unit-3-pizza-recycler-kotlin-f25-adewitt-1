@@ -1,5 +1,6 @@
-package cis.kotlin_pizzarecyclerstart
+package cis.kotlin_pizzarecyclerstart.data
 
+import cis.kotlin_pizzarecyclerstart.Pizza
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

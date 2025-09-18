@@ -1,10 +1,11 @@
-package cis.kotlin_pizzarecyclerstart
-
+package cis.kotlin_pizzarecyclerstart.data
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import cis.kotlin_pizzarecyclerstart.Pizza
+import cis.kotlin_pizzarecyclerstart.PizzaSize
 import kotlinx.coroutines.flow.Flow
 
 @Dao
