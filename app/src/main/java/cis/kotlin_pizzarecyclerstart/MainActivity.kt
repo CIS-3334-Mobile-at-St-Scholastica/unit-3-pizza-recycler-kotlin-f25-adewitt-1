@@ -41,6 +41,8 @@ import cis.kotlin_pizzarecyclerstart.data.PizzaRepositoryImpl
 
 // Your project imports
 import cis.kotlin_pizzarecyclerstart.ui.theme.Kotlin_PizzaRecyclerStart_F25Theme
+import cis.kotlin_pizzarecyclerstart.ui.theme.components.PizzaItem
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,8 +113,8 @@ fun PizzaOrderScreen(vm: MainViewModel) {
 
         Spacer(Modifier.height(16.dp))
 
-        // ✅ FIX: keep OrderBox *inside the Column scope*
-        OrderBox(orderText)
+        // OrderBox(orderText)
+        PizzaList(pizzas = vm.pizzas.collectAsState().value);
     }
 }
 
@@ -165,13 +167,6 @@ fun OrderBox(orderText: String) {
         maxLines = 20
     )
 }
-
-@Composable
-    fun PizzaItem(pizza: Pizza) {
-        Column(Modifier.padding(all=16.dp)) {
-            Text(pizza.size.toString(), style = MaterialTheme.typography.titleMedium)
-        }
-    }
 
 @Composable
 fun PizzaList(pizzas: List<Pizza>) {
